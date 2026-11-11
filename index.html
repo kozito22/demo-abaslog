@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abaslog — Abastecimiento para obras (demo)</title>
+<meta name="description" content="Demo preparada por GTM Digital para Comercial Abaslog: catálogo, cotización en línea y seguimiento de órdenes de compra.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hormigon: #DCDFE1;
+    --hormigon-claro: #ECEEEF;
+    --acero: #1F2A33;
+    --galvanizado: #5B6B78;
+    --kraft: #C69A5B;
+    --kraft-claro: #E6CFA6;
+    --senal: #E8A317;
+    --entrega: #2E7D4F;
+    --blanco: #FBFCFC;
+    --linea: #B9C0C5;
+    --radio: 6px;
+    --ancho: 1180px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+  body {
+    margin: 0;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--acero);
+    background: var(--hormigon);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--senal); outline-offset: 2px; }
+  .envoltura { max-width: var(--ancho); margin: 0 auto; padding: 0 24px; }
+
+  /* Aviso de demo */
+  .aviso-demo {
+    background: var(--acero); color: var(--hormigon-claro);
+    font-size: 14px; text-align: center; padding: 8px 16px;
+  }
+  .aviso-demo a { color: var(--kraft-claro); }
+
+  /* Encabezado */
+  header.barra {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(220, 223, 225, .94); backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--linea);
+  }
+  .barra .envoltura { display: flex; align-items: center; gap: 28px; height: 68px; }
+  .marca {
+    font-variation-settings: "wdth" 125; font-weight: 800; font-size: 24px;
+    letter-spacing: .04em; text-decoration: none;
+  }
+  .marca small { display: block; font-variation-settings: "wdth" 100; font-weight: 500; font-size: 12px; letter-spacing: 0; color: var(--galvanizado); margin-top: -4px; }
+  nav.menu { display: flex; gap: 22px; margin-left: auto; }
+  nav.menu a { text-decoration: none; font-weight: 600; font-size: 15px; padding: 6px 0; border-bottom: 2px solid transparent; }
+  nav.menu a:hover { border-color: var(--acero); }
+  .boton {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    font: inherit; font-weight: 700; font-size: 15px; text-decoration: none;
+    padding: 12px 20px; border-radius: var(--radio); border: 2px solid var(--acero);
+    background: var(--acero); color: var(--blanco);
+  }
+  .boton:hover { background: #2C3A46; }
+  .boton.secundario { background: transparent; color: var(--acero); }
+  .boton.secundario:hover { background: var(--hormigon-claro); }
+  .contador-cot {
+    min-width: 24px; height: 24px; padding: 0 6px; border-radius: 12px;
+    background: var(--senal); color: var(--acero); font-size: 13px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* Portada */
+  .portada { padding: 72px 0 64px; }
+  .portada .envoltura { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  .portada h1 {
+    font-variation-settings: "wdth" 125; font-weight: 800;
+    font-size: clamp(38px, 5.2vw, 64px); line-height: 1.02; letter-spacing: -.01em;
+    margin: 0 0 22px; max-width: 13ch;
+  }
+  .portada p.bajada { font-size: 19px; max-width: 46ch; color: #33424F; margin: 0 0 30px; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sectores { margin-top: 36px; display: flex; gap: 10px; flex-wrap: wrap; font-size: 15px; color: var(--galvanizado); }
+  .sectores span { border: 1px solid var(--linea); border-radius: 30px; padding: 4px 14px; background: var(--hormigon-claro); }
+
+  /* Guía de despacho (el elemento memorable) */
+  .guia {
+    position: relative; background: var(--kraft-claro); color: #3A2C17;
+    border-radius: var(--radio); padding: 26px 26px 22px;
+    box-shadow: 0 1px 0 #B58A4F, 0 14px 30px -18px rgba(58, 44, 23, .55);
+    transform: rotate(1.2deg);
+    background-image: repeating-linear-gradient(90deg, rgba(120, 85, 40, .05) 0 2px, transparent 2px 7px);
+    animation: llega .7s cubic-bezier(.2, .8, .2, 1) both .15s;
+  }
+  @keyframes llega { from { opacity: 0; transform: translateY(18px) rotate(3deg); } to { opacity: 1; transform: rotate(1.2deg); } }
+  .guia::before, .guia::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 10px;
+    background: radial-gradient(circle at 6px 5px, var(--hormigon) 4px, transparent 4.5px) repeat-x;
+    background-size: 14px 10px;
+  }
+  .guia::before { top: -5px; } .guia::after { bottom: -5px; }
+  .guia-encabezado { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px dashed #A27C45; padding-bottom: 12px; margin-bottom: 16px; }
+  .guia-encabezado strong { font-variation-settings: "wdth" 125; font-size: 18px; }
+  .guia-encabezado span { font-size: 13px; }
+  .guia dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 15px; }
+  .guia dt { color: #6E5530; }
+  .guia dd { margin: 0; font-weight: 600; }
+  .cierre { margin: 18px 0 4px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .cierre .reloj {
+    font-variation-settings: "wdth" 112; font-weight: 800; font-size: 46px; line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--acero);
+  }
+  .cierre .estado { font-size: 14px; font-weight: 700; color: #6E4A06; background: rgba(232, 163, 23, .35); padding: 3px 10px; border-radius: 20px; }
+  .guia .pie { font-size: 13px; color: #6E5530; margin: 6px 0 0; }
+
+  /* Secciones */
+  section.bloque { padding: 72px 0; }
+  section.bloque.blanco { background: var(--blanco); }
+  h2 { font-variation-settings: "wdth" 118; font-weight: 800; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; margin: 0 0 12px; }
+  .intro { max-width: 60ch; color: #3C4A56; margin: 0 0 36px; }
+
+  /* Catálogo */
+  .catalogo { display: grid; grid-template-columns: 240px 1fr; gap: 36px; }
+  .categorias { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 92px; align-self: start; }
+  .categorias button {
+    text-align: left; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+    background: none; border: 0; border-left: 3px solid transparent; padding: 9px 12px; color: var(--galvanizado);
+    display: flex; justify-content: space-between;
+  }
+  .categorias button span { font-weight: 400; }
+  .categorias button[aria-pressed="true"] { color: var(--acero); border-left-color: var(--kraft); background: var(--hormigon-claro); }
+  .buscador { display: flex; gap: 10px; margin-bottom: 18px; }
+  .buscador input {
+    flex: 1; font: inherit; padding: 12px 14px; border: 2px solid var(--linea); border-radius: var(--radio); background: var(--blanco);
+  }
+  .buscador input:focus { border-color: var(--acero); outline: none; }
+  .resumen-lista { font-size: 14px; color: var(--galvanizado); margin: 0 0 8px; }
+  ul.productos { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
+  ul.productos li { display: flex; align-items: center; gap: 14px; padding: 11px 4px; border-bottom: 1px solid var(--linea); }
+  ul.productos .nombre { flex: 1; }
+  ul.productos .cat { font-size: 13px; color: var(--galvanizado); }
+  .cantidad { width: 64px; font: inherit; padding: 6px 8px; border: 1px solid var(--linea); border-radius: var(--radio); text-align: center; }
+  .agregar { font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: var(--radio); border: 2px solid var(--acero); background: var(--blanco); color: var(--acero); }
+  .agregar:hover { background: var(--acero); color: var(--blanco); }
+  .agregar.listo { border-color: var(--entrega); background: var(--entrega); color: var(--blanco); }
+  .sin-resultados { padding: 28px 4px; color: var(--galvanizado); }
+  .nota-catalogo { font-size: 14px; color: var(--galvanizado); margin-top: 16px; }
+
+  /* Servicios */
+  .servicios { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 2px solid var(--acero); }
+  .servicio { padding: 28px 28px 30px 0; border-bottom: 1px solid var(--linea); }
+  .servicio:nth-child(odd) { border-right: 1px solid var(--linea); }
+  .servicio:nth-child(even) { padding-left: 28px; }
+  .servicio h3 { font-variation-settings: "wdth" 112; font-weight: 800; font-size: 22px; margin: 0 0 8px; }
+  .servicio p { margin: 0; color: #3C4A56; }
+  .servicio .dato { display: inline-block; margin-top: 12px; font-weight: 700; font-size: 15px; border-left: 3px solid var(--kraft); padding-left: 10px; }
+  .servicio ul { margin: 10px 0 0; padding-left: 18px; color: #3C4A56; }
+
+  /* Seguimiento */
+  .seguimiento { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: start; }
+  form.consulta { display: grid; gap: 14px; background: var(--hormigon-claro); padding: 24px; border-radius: var(--radio); border: 1px solid var(--linea); }
+  label { font-size: 14px; font-weight: 600; display: grid; gap: 6px; }
+  input, select, textarea { font: inherit; font-weight: 400; padding: 11px 12px; border: 2px solid var(--linea); border-radius: var(--radio); background: var(--blanco); color: var(--acero); }
+  input:focus, select:focus, textarea:focus { border-color: var(--acero); outline: none; }
+  ol.etapas { list-style: none; margin: 0; padding: 0; counter-reset: etapa; }
+  ol.etapas li { position: relative; padding: 0 0 26px 52px; counter-increment: etapa; }
+  ol.etapas li::before {
+    content: counter(etapa); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; border: 2px solid var(--linea); background: var(--blanco); color: var(--galvanizado);
+  }
+  ol.etapas li::after { content: ""; position: absolute; left: 16px; top: 36px; bottom: 2px; width: 2px; background: var(--linea); }
+  ol.etapas li:last-child::after { display: none; }
+  ol.etapas li.hecha::before { background: var(--entrega); border-color: var(--entrega); color: var(--blanco); content: "✓"; }
+  ol.etapas li.hecha::after { background: var(--entrega); }
+  ol.etapas li.actual::before { background: var(--senal); border-color: var(--senal); color: var(--acero); }
+  ol.etapas strong { display: block; }
+  ol.etapas span { font-size: 14px; color: var(--galvanizado); }
+  .resultado-oc[hidden] { display: none; }
+  .resultado-oc h3 { margin: 0 0 4px; font-size: 20px; }
+  .resultado-oc .meta { color: var(--galvanizado); font-size: 14px; margin: 0 0 22px; }
+  .vacio-oc { color: var(--galvanizado); border: 2px dashed var(--linea); border-radius: var(--radio); padding: 28px; }
+
+  /* Por qué */
+  .razones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .razones h3 { font-variation-settings: "wdth" 112; font-size: 20px; margin: 0 0 6px; }
+  .razones p { margin: 0; color: #3C4A56; }
+
+  /* Contacto */
+  .contacto { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .contacto address { font-style: normal; font-size: 18px; line-height: 1.7; }
+  .contacto address a { font-weight: 700; }
+
+  footer { background: var(--acero); color: #C5CDD3; padding: 28px 0; font-size: 14px; }
+  footer .envoltura { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--kraft-claro); }
+
+  /* Panel de cotización */
+  .velo { position: fixed; inset: 0; background: rgba(31, 42, 51, .45); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .velo.abierto { opacity: 1; pointer-events: auto; }
+  aside.panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); z-index: 50;
+    background: var(--blanco); box-shadow: -12px 0 30px -12px rgba(31, 42, 51, .4);
+    transform: translateX(100%); transition: transform .25s cubic-bezier(.2, .8, .2, 1);
+    display: flex; flex-direction: column;
+  }
+  aside.panel.abierto { transform: none; }
+  .panel-cabeza { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--linea); }
+  .panel-cabeza h2 { font-size: 24px; margin: 0; }
+  .cerrar { font: inherit; font-size: 15px; font-weight: 600; background: none; border: 0; cursor: pointer; padding: 6px; text-decoration: underline; }
+  .panel-cuerpo { padding: 18px 24px 24px; overflow-y: auto; flex: 1; }
+  ul.items { list-style: none; padding: 0; margin: 0 0 20px; }
+  ul.items li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 15px; }
+  ul.items li .nombre { flex: 1; }
+  ul.items button { font: inherit; font-size: 13px; background: none; border: 0; color: #9B2C2C; cursor: pointer; text-decoration: underline; }
+  .panel form { display: grid; gap: 12px; }
+  .confirmacion { background: #E3F0E8; border: 1px solid #A8CDB6; border-radius: var(--radio); padding: 18px; }
+  .confirmacion strong { display: block; font-size: 18px; margin-bottom: 4px; }
+
+  /* Celular */
+  @media (max-width: 900px) {
+    nav.menu { display: none; }
+    .barra .envoltura { gap: 12px; }
+    .barra .boton { margin-left: auto; padding: 10px 14px; }
+    .portada { padding: 44px 0; }
+    .portada .envoltura, .seguimiento, .contacto { grid-template-columns: 1fr; gap: 36px; }
+    .guia { transform: none; animation: none; }
+    .catalogo { grid-template-columns: 1fr; gap: 16px; }
+    .categorias { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
+    .categorias button { white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; gap: 6px; }
+    .categorias button[aria-pressed="true"] { border-bottom-color: var(--kraft); }
+    .servicios { grid-template-columns: 1fr; }
+    .servicio, .servicio:nth-child(even) { padding: 24px 0; border-right: 0 !important; }
+    .razones { grid-template-columns: 1fr; gap: 24px; }
+    section.bloque { padding: 52px 0; }
+    ul.productos li { flex-wrap: wrap; }
+    ul.productos .nombre { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aviso-demo">Demo preparada por <a href="https://gtmdigital.cl">GTM Digital</a> para Comercial Abaslog. No es el sitio oficial: los formularios no envían datos.</div>
+
+<header class="barra">
+  <div class="envoltura">
+    <a class="marca" href="#inicio">ABASLOG<small>Abastecimiento y logística</small></a>
+    <nav class="menu" aria-label="Secciones">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#seguimiento">Seguimiento de OC</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="boton" type="button" data-abrir-panel>Mi cotización <span class="contador-cot" id="contador">0</span></button>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="portada">
+    <div class="envoltura">
+      <div>
+        <h1>Todo lo que su obra necesita, en un solo despacho.</h1>
+        <p class="bajada">Herramientas, fijaciones, elementos de seguridad, eléctricos y más para construcción, minería e industria. Consolidamos su compra y la llevamos a su obra para que el trabajo no se detenga.</p>
+        <div class="acciones">
+          <a class="boton" href="#catalogo">Armar una cotización</a>
+          <a class="boton secundario" href="#seguimiento">Seguir mi orden de compra</a>
+        </div>
+        <div class="sectores" aria-label="Sectores que atendemos">
+          <span>Construcción</span><span>Minería</span><span>Industria</span>
+        </div>
+      </div>
+
+      <div class="guia" aria-live="polite">
+        <div class="guia-encabezado">
+          <strong>Guía de despacho</strong>
+          <span id="guia-fecha">Hoy</span>
+        </div>
+        <dl>
+          <dt>Origen</dt><dd>Bodegas Coyancura, San Bernardo</dd>
+          <dt>Destino</dt><dd>Su obra o faena</dd>
+          <dt>Entrega</dt><dd id="guia-entrega">Mañana, entre 08:30 y 18:00</dd>
+        </dl>
+        <div class="cierre">
+          <span class="reloj" id="reloj">--:--:--</span>
+          <span class="estado" id="estado-cierre">para el cierre de las 17:30</span>
+        </div>
+        <p class="pie">Toda orden de compra recibida antes de las 17:30 se despacha a obra al día hábil siguiente.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque blanco" id="catalogo">
+    <div class="envoltura">
+      <h2>Catálogo</h2>
+      <p class="intro">Busque lo que necesita, indique la cantidad y agréguelo a su cotización. Al final envía una sola solicitud con todo el pedido.</p>
+      <div class="catalogo">
+        <div class="categorias" id="categorias" role="group" aria-label="Categorías"></div>
+        <div>
+          <div class="buscador">
+            <input type="search" id="buscar" placeholder="Buscar: guantes, pernos, taladro…" aria-label="Buscar en el catálogo">
+          </div>
+          <p class="resumen-lista" id="resumen-lista"></p>
+          <ul class="productos" id="productos"></ul>
+          <p class="nota-catalogo">¿No encuentra un producto? Escríbalo en la cotización: abastecemos todo lo necesario para la ejecución de sus obras y proyectos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque" id="servicios">
+    <div class="envoltura">
+      <h2>Servicios</h2>
+      <p class="intro">Elija cómo recibir su pedido según la urgencia de la obra.</p>
+      <div class="servicios">
+        <article class="servicio">
+          <h3>Abastecimiento estándar</h3>
+          <p>Su orden de compra se prepara en bodega y se despacha directo a la obra.</p>
+          <span class="dato">Pedido antes de las 17:30, entrega al día siguiente de 08:30 a 18:00</span>
+        </article>
+        <article class="servicio">
+          <h3>Abastecimiento express</h3>
+          <p>Para necesidades urgentes de la obra. Movemos cargas menores en furgones y motos.</p>
+          <span class="dato">Consulte disponibilidad</span>
+        </article>
+        <article class="servicio">
+          <h3>Consolidación de carga</h3>
+          <p>Reunimos en nuestro centro de distribución lo que compra a distintos proveedores, para que sus retiros se concentren en un solo punto.</p>
+        </article>
+        <article class="servicio">
+          <h3>Servicios de valor agregado</h3>
+          <p>Preparamos los productos según lo que necesita su operación:</p>
+          <ul><li>Pegado de etiquetas</li><li>Armado de unidades especiales de venta</li><li>Embalajes especiales, entre otros</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque blanco" id="seguimiento">
+    <div class="envoltura seguimiento">
+      <div>
+        <h2>Seguimiento de su orden de compra</h2>
+        <p class="intro">Vea en qué etapa está su pedido sin llamar a nadie. Trazabilidad web de todas sus órdenes de compra.</p>
+        <form class="consulta" id="form-oc">
+          <label>Número de orden de compra
+            <input id="oc-numero" required placeholder="Ej.: 4500012871" inputmode="numeric">
+          </label>
+          <label>RUT de la empresa
+            <input id="oc-rut" required placeholder="Ej.: 76.123.456-7">
+          </label>
+          <button class="boton" type="submit">Ver estado del pedido</button>
+        </form>
+      </div>
+      <div>
+        <div class="vacio-oc" id="vacio-oc">Ingrese su número de orden de compra y el RUT de su empresa para ver el estado del despacho.</div>
+        <div class="resultado-oc" id="resultado-oc" hidden>
+          <h3 id="oc-titulo">Orden de compra</h3>
+          <p class="meta">Datos de ejemplo para la demo</p>
+          <ol class="etapas">
+            <li class="hecha"><strong>Orden recibida</strong><span id="et-1"></span></li>
+            <li class="hecha"><strong>Preparación en bodega</strong><span>Productos consolidados y revisados</span></li>
+            <li class="actual"><strong>En ruta a su obra</strong><span id="et-3">Salió de Bodegas Coyancura</span></li>
+            <li><strong>Entregado en obra</strong><span id="et-4"></span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque" id="por-que">
+    <div class="envoltura">
+      <h2>Por qué elegir Abaslog</h2>
+      <p class="intro">Profesionales con gran experiencia en servicios logísticos y en el abastecimiento de obras y proyectos.</p>
+      <div class="razones">
+        <div><h3>Su obra no se detiene</h3><p>Gestionamos y supervisamos constantemente la entrega, con procesos internos de preparación que aseguran recibir lo que pidió.</p></div>
+        <div><h3>Una sola compra</h3><p>Consolidamos productos de distintas líneas en un abastecimiento continuo, con ahorro en tiempo y costos.</p></div>
+        <div><h3>Decisiones rápidas</h3><p>Una organización liviana y flexible, con un objetivo central: resolver lo que necesita su proyecto.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque blanco" id="contacto">
+    <div class="envoltura contacto">
+      <div>
+        <h2>Contacto</h2>
+        <address>
+          Comercial Abaslog SpA<br>
+          Camino Los Pinos 03989, Bodegas Coyancura<br>
+          San Bernardo, Región Metropolitana<br>
+          <a href="tel:+56229960019">(56 2) 2996 0019</a> · <a href="tel:+56229960020">(56 2) 2996 0020</a><br>
+          <a href="https://www.google.com/maps/search/?api=1&query=Camino+Los+Pinos+03989+San+Bernardo">Ver en el mapa</a>
+        </address>
+      </div>
+      <form class="consulta" id="form-contacto">
+        <label>Nombre<input required autocomplete="name"></label>
+        <label>Empresa<input autocomplete="organization"></label>
+        <label>Correo<input type="email" required autocomplete="email"></label>
+        <label>Mensaje<textarea rows="4" required></textarea></label>
+        <button class="boton" type="submit">Enviar mensaje</button>
+        <p id="ok-contacto" hidden class="confirmacion" role="status"><strong>Mensaje listo</strong>En el sitio real llegaría al correo de Abaslog. En esta demo no se envía.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="envoltura">
+    <span>Comercial Abaslog SpA · RUT 76.203.641-K</span>
+    <span>Demo de diseño por <a href="https://gtmdigital.cl">GTM Digital</a></span>
+  </div>
+</footer>
+
+<div class="velo" id="velo" data-cerrar-panel></div>
+<aside class="panel" id="panel" aria-labelledby="titulo-panel" aria-hidden="true">
+  <div class="panel-cabeza">
+    <h2 id="titulo-panel">Mi cotización</h2>
+    <button class="cerrar" type="button" data-cerrar-panel>Cerrar</button>
+  </div>
+  <div class="panel-cuerpo">
+    <ul class="items" id="items"></ul>
+    <p id="cot-vacia" class="vacio-oc">Aún no agrega productos. Use el catálogo para armar su pedido.</p>
+    <form id="form-cot">
+      <label>Empresa<input required autocomplete="organization"></label>
+      <label>RUT<input required placeholder="76.123.456-7"></label>
+      <label>Dirección de la obra o faena<input required></label>
+      <label>Nombre de contacto<input required autocomplete="name"></label>
+      <label>Correo<input type="email" required autocomplete="email"></label>
+      <label>Servicio
+        <select><option>Abastecimiento estándar</option><option>Abastecimiento express</option><option>Consolidación de carga</option></select>
+      </label>
+      <label>Comentarios u otros productos<textarea rows="3"></textarea></label>
+      <button class="boton" type="submit">Enviar solicitud de cotización</button>
+    </form>
+    <div class="confirmacion" id="ok-cot" hidden role="status"></div>
+  </div>
+</aside>
+
+<script>
+// Catálogo real de Abaslog (abaslog.cl/productos), ordenado por categoría.
+const CATALOGO = {
+  "Herramientas": ["Alicates","Alicates aislados","Alicates para seguros","Balanza","Baldes","Base magnética","Cable de acero","Cadenas galvanizadas","Caja de herramientas","Carretilla","Carros","Chicharra","Chuzos","Combos","Cordeles","Juego de dados corriente","Dado de impacto","Juego de desatornilladores","Detector de voltaje","Engrapadora","Escalas","Escuadras","Feeler","Formones","Huinchas de medir","Lienzas","Juego de llaves punta y corona","Juego de llaves Allen","Juego de llaves Torx","Llave ajustable Stillson","Llave cadena","Llave cola de punta golpe","Llave de torque","Macetas","Mangos","Marco sierra","Martillos","Micrómetro","Multímetro","Napoleón","Niveles","Odómetro","Palas","Picotas","Pie de metro","Plomadas","Puntas desatornillador","Reloj control","Ruedas","Serruchos","Tecles","Tenazas Cayman","Tijeras","Tiza","Tizadores","Transpaletas"],
+  "Fijaciones y cerrajería": ["Cáncamos","Candados","Cerraduras","Cerrojos","Cierra puertas","Clavo corriente","Clavo de acero","Espárragos","Fulminantes","Golillas","Llaveros","Pernos","Picaporte","Pomeles","Porta candado","Remache pop","Tarugos","Tornillos","Tuercas"],
+  "Seguridad y EPP": ["Antiparras","Botín de seguridad","Botiquín","Casco de seguridad","Chaleco","Chaqueta para soldar","Cinta de peligro","Coleto","Cono de señalización","Cubre calzado","Extintor","Gorro para soldar","Guantes","Manta de soldador","Máscara para soldar","Mascarilla","Polaina","Protector facial con visor","Protector de oído","Tapón de oído","Vidrio para máscara de soldar","Zapato de seguridad"],
+  "Aseo, oficina y embalaje": ["Alcohol","Basureros","Bidones","Bolsas","Calculadoras","Cardex","Cartón corrugado","Cintas de embalaje","Clips","Contenedores","Corchetera","Corrector","Desengrasantes","Destacador","Escobas","Escobillones","Escritorios","Esquineros","Estanques","Film","Fondo de aluminio","Hebillas para zuncho","Huaipe","Lápices","Lápiz carpintero","Lavalozas","Libreros","Limpiadores","Lockers metálicos","Máquina enzunchadora","Mopas, carro y balde","Paños","Papel higiénico","Persianas","Pizarra acrílica","Plástico burbuja","Plumón marca metal","Plumones","Resmas de papel","Sacos para escombro","Sellos metálicos","Siliconas","Sillas","Tambores","Toalla Nova","Tóner","Zunchos"],
+  "Eléctricos": ["Alargador eléctrico","Amarras plásticas","Ampolletas","Atornilladores","Cable eléctrico","Caja estanca","Cargadores","Cintas aisladoras","Conectores","Cordón eléctrico","Enchufes","Equipos fluorescentes","Esmeriles","Focos","Fusibles","Interruptores","Lámparas","Linternas","Partidor","Pilas","Rotomartillo","Sierras","Sopladores","Soquete","Taladros","Terminales","Tubos fluorescentes"],
+  "Gasfitería y riego": ["Accesorios para riego","Cañerías","Challa para ducha","Copla, codo, terminal y tee","Llaves de jardín","Mangueras","Monomando","Sifón y desagüe","Tubos","Unión Chicago y americana","Válvula de bola","Fitting para WC"],
+  "Pinturas y químicos": ["Aceites","Ácido muriático","Adhesivo para PVC","Aguarrás mineral","Anticorrosivo","Barniz","Brocha de cerda","Brocha tampico","Cartucho de gas butano","Cinta de enmascarar","Diluyente","Disco de lija"]
+};
+const TODOS = Object.entries(CATALOGO).flatMap(([cat, lista]) => lista.map(n => ({ nombre: n, cat })));
+let categoria = "Todas";
+const cotizacion = new Map();
+
+const $ = s => document.querySelector(s);
+const sinTildes = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function pintarCategorias() {
+  const cont = $("#categorias");
+  const cats = ["Todas", ...Object.keys(CATALOGO)];
+  cont.innerHTML = "";
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-pressed", c === categoria);
+    const n = c === "Todas" ? TODOS.length : CATALOGO[c].length;
+    b.innerHTML = `${c} <span>${n}</span>`;
+    b.onclick = () => { categoria = c; pintarCategorias(); pintarProductos(); };
+    cont.appendChild(b);
+  });
+}
+
+function pintarProductos() {
+  const q = sinTildes($("#buscar").value.trim());
+  const lista = TODOS.filter(p => (categoria === "Todas" || p.cat === categoria) && (!q || sinTildes(p.nombre).includes(q)));
+  const ul = $("#productos");
+  ul.innerHTML = "";
+  $("#resumen-lista").textContent = `${lista.length} producto${lista.length === 1 ? "" : "s"}` + (categoria !== "Todas" ? ` en ${categoria}` : "");
+  if (!lista.length) {
+    ul.innerHTML = `<li class="sin-resultados">No hay productos con “${$("#buscar").value}”. Agréguelo como comentario en su cotización y lo buscamos por usted.</li>`;
+    return;
+  }
+  lista.forEach(p => {
+    const li = document.createElement("li");
+    const ya = cotizacion.has(p.nombre);
+    li.innerHTML = `<span class="nombre">${p.nombre}<br><span class="cat">${p.cat}</span></span>
+      <input class="cantidad" type="number" min="1" value="${ya ? cotizacion.get(p.nombre).cant : 1}" aria-label="Cantidad de ${p.nombre}">
+      <button class="agregar ${ya ? "listo" : ""}" type="button">${ya ? "Agregado" : "Agregar"}</button>`;
+    li.querySelector("button").onclick = e => {
+      const cant = Math.max(1, parseInt(li.querySelector("input").value) || 1);
+      cotizacion.set(p.nombre, { cant, cat: p.cat });
+      e.target.textContent = "Agregado"; e.target.classList.add("listo");
+      pintarCotizacion();
+    };
+    ul.appendChild(li);
+  });
+}
+
+function pintarCotizacion() {
+  $("#contador").textContent = cotizacion.size;
+  const ul = $("#items");
+  ul.innerHTML = "";
+  cotizacion.forEach((v, nombre) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="nombre">${nombre}</span><span>${v.cant} u.</span><button type="button">Quitar</button>`;
+    li.querySelector("button").onclick = () => { cotizacion.delete(nombre); pintarCotizacion(); pintarProductos(); };
+    ul.appendChild(li);
+  });
+  $("#cot-vacia").hidden = cotizacion.size > 0;
+}
+
+function abrirPanel(abrir) {
+  $("#panel").classList.toggle("abierto", abrir);
+  $("#velo").classList.toggle("abierto", abrir);
+  $("#panel").setAttribute("aria-hidden", !abrir);
+  if (abrir) $("#panel .cerrar").focus();
+}
+document.querySelectorAll("[data-abrir-panel]").forEach(b => b.onclick = () => abrirPanel(true));
+document.querySelectorAll("[data-cerrar-panel]").forEach(b => b.onclick = () => abrirPanel(false));
+document.addEventListener("keydown", e => { if (e.key === "Escape") abrirPanel(false); });
+
+$("#form-cot").onsubmit = e => {
+  e.preventDefault();
+  const n = "COT-" + String(Date.now()).slice(-5);
+  const items = [...cotizacion].map(([k, v]) => `${v.cant} × ${k}`).join(", ") || "sin productos del catálogo";
+  $("#ok-cot").innerHTML = `<strong>Solicitud ${n} enviada</strong>Recibirá su cotización por correo. Pedido: ${items}.<br><small>En esta demo no se envía ningún dato.</small>`;
+  $("#ok-cot").hidden = false;
+  e.target.hidden = true;
+};
+$("#form-contacto").onsubmit = e => { e.preventDefault(); $("#ok-contacto").hidden = false; };
+
+// Guía de despacho: cuenta regresiva real al cierre de las 17:30 (días hábiles).
+const dias = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const fmtFecha = d => `${dias[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`;
+function siguienteHabil(d) { const x = new Date(d); do { x.setDate(x.getDate() + 1); } while (x.getDay() === 0 || x.getDay() === 6); return x; }
+function cierreDesde(ahora) {
+  const c = new Date(ahora); c.setHours(17, 30, 0, 0);
+  const habil = ahora.getDay() !== 0 && ahora.getDay() !== 6;
+  if (habil && ahora < c) return c;
+  const s = siguienteHabil(ahora); s.setHours(17, 30, 0, 0); return s;
+}
+function tic() {
+  const ahora = new Date();
+  const cierre = cierreDesde(ahora);
+  const ms = cierre - ahora;
+  const h = Math.floor(ms / 3.6e6), m = Math.floor(ms % 3.6e6 / 6e4), s = Math.floor(ms % 6e4 / 1e3);
+  const dos = n => String(n).padStart(2, "0");
+  $("#reloj").textContent = `${dos(h)}:${dos(m)}:${dos(s)}`;
+  const esHoy = cierre.toDateString() === ahora.toDateString();
+  $("#estado-cierre").textContent = esHoy ? "para el cierre de hoy a las 17:30" : `para el cierre del ${fmtFecha(cierre)} a las 17:30`;
+  $("#guia-fecha").textContent = fmtFecha(ahora);
+  $("#guia-entrega").textContent = `${fmtFecha(siguienteHabil(cierre))}, entre 08:30 y 18:00`;
+}
+tic(); setInterval(tic, 1000);
+
+// Seguimiento de OC (datos de ejemplo)
+$("#form-oc").onsubmit = e => {
+  e.preventDefault();
+  const hoy = new Date(), ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  $("#oc-titulo").textContent = `Orden de compra ${$("#oc-numero").value.trim()}`;
+  $("#et-1").textContent = `Recibida el ${fmtFecha(ayer)} a las 16:42`;
+  $("#et-3").textContent = `Salió de Bodegas Coyancura hoy a las 08:10`;
+  $("#et-4").textContent = `Estimado: hoy antes de las 18:00`;
+  $("#vacio-oc").hidden = true;
+  $("#resultado-oc").hidden = false;
+};
+
+pintarCategorias(); pintarProductos(); pintarCotizacion();
+</script>
+</body>
+</html>
